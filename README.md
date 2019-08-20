@@ -22,15 +22,15 @@ Configuration file section:
         [ 
             {
                 "Name": "Text Import",
-                "Directory": "C:\\Import",
+                "Directory": "C:\\ImportText",
                 "SearchPattern": "*.txt",
                 "SearchRegExPattern": ".*",
                 "CallbackURL": "http://localhost/MakeTextImport"
             },
             {
                 "Name": "Excel Import",
-                "Directory": "C:\\Import",
-                "SearchPattern": "*.txt",
+                "Directory": "C:\\ImportExcel",
+                "SearchPattern": "*.xlsx",
                 "SearchRegExPattern": ".*",
             }
         ],        
