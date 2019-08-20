@@ -12,8 +12,9 @@ init:
 before_build:
 
 build_script:
-- docker run -v $PWD:/build --rm mcr.microsoft.com/dotnet/core/sdk:2.2 dotnet publish build/DCCS.AspNetCore.FileWatcherService -o /build/output
-#- dotnet publish DCCS.AspNetCore.FileWatcherService -o /output
+- docker run -v $PWD:/build --rm mcr.microsoft.com/dotnet/core/sdk:2.2 ls ./build
+#- docker run -v $PWD:/build --rm mcr.microsoft.com/dotnet/core/sdk:2.2 dotnet publish build/DCCS.AspNetCore.FileWatcherService -o /build/output
+- dotnet publish DCCS.AspNetCore.FileWatcherService -o /output
 after_build:
 
 test_script:
