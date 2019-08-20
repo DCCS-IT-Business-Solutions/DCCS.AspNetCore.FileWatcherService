@@ -20,7 +20,7 @@ Configuration file section:
         "Watches":
         [ 
             {
-                "Directory": "C:\Import",
+                "Directory": "C:\\Import",
                 "SearchPattern": "*.txt",
                 "SearchRegExPattern": ".*",
                 "DelayInMS": 500 
