@@ -11,7 +11,7 @@ init:
 - ps: $Env:LABEL = "CI" + $Env:APPVEYOR_BUILD_NUMBER.PadLeft(5, "0")
 before_build:
 - pwd
-- docker run -v $PWD/DCCS.AspNetCore.FileWatcherService:/app --rm mcr.microsoft.com/dotnet/core/sdk:2.2 ls /app
+- docker run -v $PWD:/build --rm mcr.microsoft.com/dotnet/core/sdk:2.2 dotnet publish /build//DCCS.AspNetCore.FileWatcherService -out /build/output
 build_script:
 - dotnet --version
 after_build:
@@ -19,7 +19,7 @@ after_build:
 test_script:
 
 artifacts:
-- path: artifacts\**\*.*
+- path: output\**\*.*
 cache:
 - '%USERPROFILE%\.nuget\packages'
 on_finish: # Run the demo to show that it works
