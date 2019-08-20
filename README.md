@@ -1,5 +1,5 @@
 # DCCS.FileWatcherService
-DCCS.FileWatcherService provide a simple configureable file watcher service which calls a function with a short deplay to handle multiple file changes in a short timer period.
+DCCS.FileWatcherService provide a simple configureable file watcher service which calls a function with a short deplay to handle multiple file changes in a short timer period. The callback can be specified as delegate in the startup of the your webproject or as url in the configuration.
 
 ## Installation
 
@@ -9,7 +9,8 @@ TBD
 
 Include in startup:
 ```csharp
-// TBD
+services.AddDccsBuildingBlockFileWatcherService()
+.AddHandler("Excel Import", (o,a) => { /* called for each change */ } )
 ```
 
 Configuration file section:
@@ -20,12 +21,20 @@ Configuration file section:
         "Watches":
         [ 
             {
+                "Name": "Text Import",
                 "Directory": "C:\\Import",
                 "SearchPattern": "*.txt",
                 "SearchRegExPattern": ".*",
-                "DelayInMS": 500 
+                "CallbackURL": "http://localhost/MakeTextImport"
+            },
+            {
+                "Name": "Excel Import",
+                "Directory": "C:\\Import",
+                "SearchPattern": "*.txt",
+                "SearchRegExPattern": ".*",
             }
-        ]        
+        ],        
+        "DelayInMS": 500 
     }
 }
 ```
