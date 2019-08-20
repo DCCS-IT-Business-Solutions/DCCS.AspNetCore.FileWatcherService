@@ -1,6 +1,7 @@
 version: '1.0.{build}'
+image:
+- Ubuntu
 configuration:
-- Debug
 - Release
 platform: Any CPU
 environment:
@@ -9,7 +10,8 @@ environment:
 init:
 - ps: $Env:LABEL = "CI" + $Env:APPVEYOR_BUILD_NUMBER.PadLeft(5, "0")
 before_build:
-- appveyor-retry dotnet restore -v Minimal
+- docker -v
+- dotnet restore
 build_script:
 - dotnet --version
 after_build:
