@@ -10,8 +10,8 @@ environment:
 init:
 - ps: $Env:LABEL = "CI" + $Env:APPVEYOR_BUILD_NUMBER.PadLeft(5, "0")
 before_build:
-- docker -v
-- dotnet restore
+- pwd
+- docker run -v /DCCS.AspNetCore.FileWatcherService:/app --rm mcr.microsoft.com/dotnet/core/sdk:2.2 ls /app
 build_script:
 - dotnet --version
 after_build:
