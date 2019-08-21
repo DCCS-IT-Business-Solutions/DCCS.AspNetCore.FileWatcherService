@@ -3,7 +3,16 @@ DCCS.FileWatcherService provide a simple configureable file watcher service whic
 
 ## Installation
 
-TBD
+Install [DCCS.AspNetCore.FileWatcherService](https://www.nuget.org/packages/DCCS.AspNetCore.FileWatcherService/) with NuGet:
+
+    Install-Package DCCS.AspNetCore.FileWatcherService
+
+Or via the .NET Core command line interface:
+
+    dotnet add package DCCS.AspNetCore.FileWatcherService
+
+Either commands, from Package Manager Console or .NET Core CLI, will download and install DCCS.AspNetCore.FileWatcherService and all required dependencies.
+
 
 ## Examples
 
