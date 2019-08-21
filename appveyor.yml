@@ -4,6 +4,14 @@ image:
 configuration:
 - Release
 platform: Any CPU
+dotnet_csproj:
+  patch: true
+  file: '**\*.csproj'
+  version: '{version}'
+  package_version: '{version}'
+  assembly_version: '{version}'
+  file_version: '{version}'
+  informational_version: '{version}'
 environment:
   # Don't report back to the mothership
   DOTNET_CLI_TELEMETRY_OPTOUT: 1
@@ -15,7 +23,7 @@ build_script:
 - ls
 #- docker run -v $PWD:/build --rm mcr.microsoft.com/dotnet/core/sdk:2.2 ls /build
 #- docker run -v $PWD:/build --rm mcr.microsoft.com/dotnet/core/sdk:2.2 dotnet publish /build/DCCS.AspNetCore.FileWatcherService -o /build/output
-- dotnet publish DCCS.AspNetCore.FileWatcherService -o output
+- dotnet build DCCS.AspNetCore.FileWatcherService -o output
 after_build:
 - dotnet nuget push DCCS.AspNetCore.FileWatcherService/**/*.nupkg -k ic7qctsy1eetvpla7sytctyx
 test_script:
