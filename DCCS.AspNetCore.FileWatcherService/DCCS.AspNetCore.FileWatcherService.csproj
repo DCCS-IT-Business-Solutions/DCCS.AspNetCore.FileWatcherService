@@ -3,6 +3,11 @@
   <PropertyGroup>
     <RootNamespace>DCCS.AspNetCore.FileWatcherService</RootNamespace>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <Copyright>DCCS GmbH</Copyright>
+    <RepositoryUrl>https://github.com/DCCS-IT-Business-Solutions/DCCS.AspNetCore.FileWatcherService.git</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/DCCS-IT-Business-Solutions/DCCS.AspNetCore.FileWatcherService</PackageProjectUrl>
   </PropertyGroup>
 
 </Project>
