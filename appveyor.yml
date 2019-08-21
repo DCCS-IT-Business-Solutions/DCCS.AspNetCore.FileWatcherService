@@ -4,6 +4,11 @@ image:
 configuration:
 - Release
 platform: Any CPU
+environment:
+  # Don't report back to the mothership
+  DOTNET_CLI_TELEMETRY_OPTOUT: 1
+init:
+- ps: $Env:LABEL = "CI" + $Env:APPVEYOR_BUILD_NUMBER.PadLeft(5, "0")
 dotnet_csproj:
   patch: true
   file: '**\*.csproj'
@@ -12,23 +17,23 @@ dotnet_csproj:
   assembly_version: '{version}'
   file_version: '{version}'
   informational_version: '{version}'
-environment:
-  # Don't report back to the mothership
-  DOTNET_CLI_TELEMETRY_OPTOUT: 1
-init:
-- ps: $Env:LABEL = "CI" + $Env:APPVEYOR_BUILD_NUMBER.PadLeft(5, "0")
 before_build:
 
 build_script:
-- docker run -v $APPVEYOR_BUILD_FOLDER:/build --rm mcr.microsoft.com/dotnet/core/sdk:2.2 dotnet build /build/DCCS.AspNetCore.FileWatcherService -o /build/output
-#- dotnet build DCCS.AspNetCore.FileWatcherService -o $APPVEYOR_BUILD_FOLDER/output
+ls /var/lib/docker
+# if you want use a special version e.g. prerelease of the .NET Core SDK use the command line with the docker build, otherwise the plain dotnet build
+
+#- docker run -v $APPVEYOR_BUILD_FOLDER:/build --rm mcr.microsoft.com/dotnet/core/sdk:2.2 dotnet build /build/DCCS.AspNetCore.FileWatcherService -o /build/output
+- dotnet build DCCS.AspNetCore.FileWatcherService -o $APPVEYOR_BUILD_FOLDER/output
+
 after_build:
+# publish master branch builds to nuget
 - ps:  if ($Env:APPVEYOR_REPO_BRANCH -eq "master") { dotnet nuget push $Env:APPVEYOR_BUILD_FOLDER/output/*.nupkg -k oy2mdhhwhywyi4y3ajgqacbhqmfuc6ee3ltx4igqkopjnq -s https://api.nuget.org/v3/index.json }
 test_script:
 
 artifacts:
-- path: /output/**/*.*
+- path: $APPVEYOR_BUILD_FOLDER/output/**/*.*
 cache:
-- /var/lib/docker
+#- /var/lib/docker
 #- '%USERPROFILE%\.nuget\packages'
 on_finish: # Run the demo to show that it works
