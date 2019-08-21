@@ -22,7 +22,7 @@ before_build:
 build_script:
 - ps:  if ($Env:APPVEYOR_REPO_BRANCH -eq "master") { Write-Host "master" }
 - ps:  if ($Env:APPVEYOR_REPO_BRANCH -eq "master1") { Write-Host "no master" }
-- docker run -v $APPVEYOR_BUILD_FOLDER:/build --rm mcr.microsoft.com/dotnet/core/sdk:2.2 dotnet publish /build/DCCS.AspNetCore.FileWatcherService -o /build/output
+- docker run -v $APPVEYOR_BUILD_FOLDER:/build --rm mcr.microsoft.com/dotnet/core/sdk:2.2 dotnet build /build/DCCS.AspNetCore.FileWatcherService -o /build/output
 #- dotnet build DCCS.AspNetCore.FileWatcherService -o output
 after_build:
 - ps:  if ($Env:APPVEYOR_REPO_BRANCH -eq "master") { dotnet nuget push DCCS.AspNetCore.FileWatcherService/**/*.nupkg -k oy2mdhhwhywyi4y3ajgqacbhqmfuc6ee3ltx4igqkopjnq -s https://api.nuget.org/v3/index.json }
