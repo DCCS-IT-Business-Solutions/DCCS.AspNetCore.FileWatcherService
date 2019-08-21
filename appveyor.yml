@@ -5,6 +5,8 @@ configuration:
 - Release
 platform: Any CPU
 environment:
+  nuget_api_key:
+    secure: 2Wzf/WM0HNumWS09Q/T1zhxk9yrBAgf5GsD0CgRc+FkHmDP+eLTzQDjVIVAHdryB
   # Don't report back to the mothership
   DOTNET_CLI_TELEMETRY_OPTOUT: 1
 init:
@@ -39,7 +41,7 @@ deploy:
   - provider: NuGet
     name: production
     api_key:
-      secure: oy2mdhhwhywyi4y3ajgqacbhqmfuc6ee3ltx4igqkopjnq
+      secure: 2Wzf/WM0HNumWS09Q/T1zhxk9yrBAgf5GsD0CgRc+FkHmDP+eLTzQDjVIVAHdryB
     skip_symbols: true
     symbol_server:
     on:
