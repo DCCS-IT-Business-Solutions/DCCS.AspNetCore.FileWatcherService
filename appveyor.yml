@@ -20,14 +20,12 @@ init:
 before_build:
 
 build_script:
-- PROJECT_DIR="$(pwd)"
-- echo $APPVEYOR_BUILD_FOLDER
-- echo $APPVEYOR_REPO_BRANCH
-- if ["$APPVEYOR_REPO_BRANCH" = "master"] ; then echo MASTER; fi
-- if ["$APPVEYOR_REPO_BRANCH" = "master1"] ; then echo NOT MASTER; fi
-- docker run -v /home/appveyor/projects/dccs-aspnetcore-filewatcherservice:/build --rm mcr.microsoft.com/dotnet/core/sdk:2.2 ls /build
-#- docker run -v $PWD:/build --rm mcr.microsoft.com/dotnet/core/sdk:2.2 dotnet publish /build/DCCS.AspNetCore.FileWatcherService -o /build/output
-- dotnet build DCCS.AspNetCore.FileWatcherService -o output
+- if ["$APPVEYOR_REPO_BRANCH" = "master"]
+- then 
+- echo MASTER
+- fi
+- docker run -v $APPVEYOR_BUILD_FOLDER:/build --rm mcr.microsoft.com/dotnet/core/sdk:2.2 dotnet publish /build/DCCS.AspNetCore.FileWatcherService -o /build/output
+#- dotnet build DCCS.AspNetCore.FileWatcherService -o output
 after_build:
 - dotnet nuget push DCCS.AspNetCore.FileWatcherService/**/*.nupkg -k oy2mdhhwhywyi4y3ajgqacbhqmfuc6ee3ltx4igqkopjnq -s https://api.nuget.org/v3/index.json
 test_script:
@@ -35,5 +33,6 @@ test_script:
 artifacts:
 - path: output\**\*.*
 cache:
+- /var/lib/docker
 #- '%USERPROFILE%\.nuget\packages'
 on_finish: # Run the demo to show that it works
