@@ -20,8 +20,14 @@ init:
 before_build:
 
 build_script:
-- pwd
-- ls
+- CURRENT_DIR="$(pwd)"
+- echo $CURRENT_DIR
+- echo $PWD
+- echo $APPVEYOR_REPO_BRANCH
+- if ["$APPVEYOR_REPO_BRANCH" = "master"] ; then; echo MASTER; fi
+- if ["$APPVEYOR_REPO_BRANCH" = "master1"] ; then; echo NOT MASTER; fi
+- ["$APPVEYOR_REPO_BRANCH" = "master"] && echo MASTER!
+- ["$APPVEYOR_REPO_BRANCH" = "master1"] && echo NOT MASTER!
 - docker run -v /home/appveyor/projects/dccs-aspnetcore-filewatcherservice:/build --rm mcr.microsoft.com/dotnet/core/sdk:2.2 ls /build
 #- docker run -v $PWD:/build --rm mcr.microsoft.com/dotnet/core/sdk:2.2 dotnet publish /build/DCCS.AspNetCore.FileWatcherService -o /build/output
 - dotnet build DCCS.AspNetCore.FileWatcherService -o output
