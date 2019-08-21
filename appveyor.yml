@@ -20,7 +20,7 @@ init:
 before_build:
 
 build_script:
-- if ["$APPVEYOR_REPO_BRANCH" = "master"]
+- if ["$APPVEYOR_REPO_BRANCH" == "master"] 
 - then 
 - echo MASTER
 - fi
