@@ -9,7 +9,9 @@ environment:
   DOTNET_CLI_TELEMETRY_OPTOUT: 1
 init:
 - ps: $Env:LABEL = "CI" + $Env:APPVEYOR_BUILD_NUMBER.PadLeft(5, "0")
-dotnet_csproj:
+
+dotnet_csproj: 
+  # Note: the .csproj file must already have the corresponding xml nodes, otherwise the patching will not work
   patch: true
   file: '**\*.csproj'
   version: '{version}'
@@ -20,7 +22,7 @@ dotnet_csproj:
 before_build:
 
 build_script:
-ls /var/lib/docker
+- ls /var/lib/docker
 # if you want use a special version e.g. prerelease of the .NET Core SDK use the command line with the docker build, otherwise the plain dotnet build
 
 #- docker run -v $APPVEYOR_BUILD_FOLDER:/build --rm mcr.microsoft.com/dotnet/core/sdk:2.2 dotnet build /build/DCCS.AspNetCore.FileWatcherService -o /build/output
