@@ -33,7 +33,7 @@ after_build:
 test_script:
 
 artifacts:
-- path: $APPVEYOR_BUILD_FOLDER/output/**/*.*
+- path: output/**/*.*
 cache:
 #- '%USERPROFILE%\.nuget\packages'
 on_finish: # Run the demo to show that it works
