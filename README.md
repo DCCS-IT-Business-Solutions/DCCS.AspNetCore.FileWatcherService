@@ -48,6 +48,8 @@ Configuration file section:
 }
 ```
 
+A full working sample is included in the source and can be found [here](https://github.com/DCCS-IT-Business-Solutions/DCCS.AspNetCore.FileWatcherService/tree/master/DCCS.AspNetCore.FileWatcherService.Sample).
+
 ## Contributing
 All contributors are welcome to improve this project. The best way would be to start a bug or feature request and discuss the way you want find a solution with us.
 After this process, please create a fork of the repository and open a pull request with your changes. Of course, if your changes are small, feel free to immediately start your pull request without previous discussion. 
