@@ -19,7 +19,7 @@ Either commands, from Package Manager Console or .NET Core CLI, will download an
 Include in startup:
 ```csharp
 services.AddDccsBuildingBlockFileWatcherService()
-.AddHandler("Excel Import", (o,a) => { /* called for each change */ } )
+.AddNotificationHandler("Excel Change", (o,a) => { /* called for each change */ } )
 ```
 
 Configuration file section:
@@ -34,16 +34,20 @@ Configuration file section:
                 "Directory": "C:\\ImportText",
                 "SearchPattern": "*.txt",
                 "SearchRegExPattern": ".*",
-                "CallbackURL": "http://localhost/MakeTextImport"
+                "CallbackUrl": "http://localhost/MakeTextImport",
+                "NotifiyDelete": false,
+                "NotifiyChange": false,
+                "NotifiyNew": true,
             },
             {
-                "Name": "Excel Import",
-                "Directory": "C:\\ImportExcel",
+                "Name": "Excel Change",
+                "Directory": "C:\\ExcelFiles",
                 "SearchPattern": "*.xlsx",
                 "SearchRegExPattern": ".*",
+                "DelayInMS": 600
             }
         ],        
-        "DelayInMS": 500 
+        "DefaultDelayInMS": 500 
     }
 }
 ```

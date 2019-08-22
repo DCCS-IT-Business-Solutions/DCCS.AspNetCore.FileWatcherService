@@ -22,27 +22,28 @@ namespace DCCS.AspNetCore.FileWatcherService
             _configuration = configuration;
             const string watchesNodeName = "Watches";
 
-            var settings = _configuration.GetSection(configurationSectionName).GetSection(watchesNodeName).Get<WatchSetting[]>();
-
-      
-            const string delayNodeName = "DelayInMS";
-            var delaySection = _configuration.GetSection(configurationSectionName).GetSection(delayNodeName).Get<int>();
-
-            foreach (var watchSetting in settings)
+            var settings = _configuration.GetSection(configurationSectionName)?.GetSection(watchesNodeName)?.Get<WatchSetting[]>();
+                  
+            const string defaultDelayNodeName = "DefaultDelayInMS";
+            var delaySection = _configuration.GetSection(configurationSectionName)?.GetSection(defaultDelayNodeName)?.Get<int>();
+            if (delaySection != null)
             {
-                watchSetting.DelayInMS = delaySection <= 0 ? 1 : delaySection;
+                foreach (var watchSetting in settings)
+                {
+                    watchSetting.DelayInMS = delaySection.Value < 0 ? 0 : delaySection.Value;
+                }
             }
-
-
-
-            for (int i = 0; i < settings.Length; i++)
+            if (settings != null)
             {
-                var setting = settings[i];
-                if (string.IsNullOrEmpty(setting.Name))
-                    throw new Exception($"Configuration block {configurationSectionName}/{watchesNodeName}[{i}] has no or an empty {nameof(WatchSetting.Name)} property");
-                var watch = new Watch(setting);
-                AddWatch(watch);
-                watch.StartWatching();
+                for (int i = 0; i < settings.Length; i++)
+                {
+                    var setting = settings[i];
+                    if (string.IsNullOrEmpty(setting.Name))
+                        throw new Exception($"Configuration block {configurationSectionName}/{watchesNodeName}[{i}] has no or an empty {nameof(WatchSetting.Name)} property");
+                    var watch = new Watch(setting);
+                    AddWatch(watch);
+                    watch.StartWatching();
+                }
             }
 
         }
@@ -54,46 +55,41 @@ namespace DCCS.AspNetCore.FileWatcherService
             _watches.Add(watch.Name, watch);
         }
 
-        public FileWatcherService AddHandler(string name, EventHandler<FileWatcherEventArgs> callback)
+        public void RemoveWatch(string watcherName)
         {
-            if (!_watches.ContainsKey(name))
-                throw new Exception($"Watch with name '{name}' does not exist");
-            var watch = _watches[name];
+            _watches.Remove(watcherName);
+        }
+
+        public IFileWatcherService AddNotificationHandler(string watcherName, EventHandler<FileWatcherEventArgs> callback)
+        {
+            if (!_watches.ContainsKey(watcherName))
+                throw new Exception($"Watch with name '{watcherName}' does not exist");
+            var watch = _watches[watcherName];
             watch.Changed += callback;
             return this;
         }
 
-        public FileWatcherService RemoveHandler(string name, EventHandler<FileWatcherEventArgs> callback)
+        public IFileWatcherService RemoveNotificationHandler(string watcherName, EventHandler<FileWatcherEventArgs> callback)
         {
-            if (!_watches.ContainsKey(name))
-                throw new Exception($"Watch with name '{name}' does not exist");
-            var watch = _watches[name];
+            if (!_watches.ContainsKey(watcherName))
+                throw new Exception($"Watch with name '{watcherName}' does not exist");
+            var watch = _watches[watcherName];
             watch.Changed -= callback;
             return this;
         }
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
-            System.Diagnostics.Debug.WriteLine("Timed Background Service is starting.");
-
-            DoWork();
-
             return Task.CompletedTask;
-        }
-
-        private void DoWork()
-        {
-            System.Diagnostics.Debug.WriteLine("Timed Background Service is working.");
-            
-
         }
 
         public Task StopAsync(CancellationToken cancellationToken)
         {
-            System.Diagnostics.Debug.WriteLine("Timed Background Service is stopping.");
-
-
-
+            if (_watches != null)
+            {
+                foreach (var watch in _watches.Values)
+                    watch.StopWatching();
+            }
             return Task.CompletedTask;
         }
 
