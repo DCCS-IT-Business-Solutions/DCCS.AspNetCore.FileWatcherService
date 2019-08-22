@@ -8,6 +8,7 @@ namespace DCCS.AspNetCore.FileWatcherService
     {
         void AddWatch(IWatch watch);
         FileWatcherService AddHandler(string name, EventHandler<FileWatcherEventArgs> callback);
+        FileWatcherService RemoveHandler(string name, EventHandler<FileWatcherEventArgs> callback);
     }
 
     public interface IWatch
