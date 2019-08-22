@@ -13,19 +13,13 @@ namespace DCCS.AspNetCore.FileWatcherService
 
     public class FileWatcherService : IFileWatcherService, IHostedService
     {
-        private const string DefaultConfigSectionName = "FileWatcherService";
+        public const string DefaultConfigSectionName = "FileWatcherService";
         private readonly Dictionary<string, IWatch> _watches = new Dictionary<string, IWatch>();
-        private IConfiguration _configuration;
+        private readonly IConfiguration _configuration;
 
-        public FileWatcherService(IConfiguration configuration)
+        public FileWatcherService(IConfiguration configuration, string configurationSectionName = DefaultConfigSectionName)
         {
             _configuration = configuration;
-
-
-        }
-
-        public FileWatcherService Initialize(string configurationSectionName = DefaultConfigSectionName)
-        {
             const string watchesNodeName = "Watches";
 
             var settings = _configuration.GetSection(configurationSectionName).GetSection(watchesNodeName).Get<WatchSetting[]>();
@@ -51,7 +45,6 @@ namespace DCCS.AspNetCore.FileWatcherService
                 watch.StartWatching();
             }
 
-            return this;
         }
 
         public void AddWatch(IWatch watch)
@@ -91,7 +84,7 @@ namespace DCCS.AspNetCore.FileWatcherService
         private void DoWork()
         {
             System.Diagnostics.Debug.WriteLine("Timed Background Service is working.");
-            this.Initialize();
+            
 
         }
 

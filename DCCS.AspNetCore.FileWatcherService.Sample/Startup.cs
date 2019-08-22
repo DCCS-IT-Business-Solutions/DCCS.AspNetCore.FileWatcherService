@@ -26,8 +26,7 @@ namespace DCCS.AspNetCore.FileWatcherService.Sample
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
-           // services.AddDccsBuildingBlockFileWatcherService(Configuration).AddHandler("Text Import", null).AddHandler("Excel Import", null);
-           services.AddHostedService<FileWatcherService>();
+            services.AddDccsBuildingBlockFileWatcherService(Configuration).AddHandler("Text Import", null).AddHandler("Excel Import", null);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
