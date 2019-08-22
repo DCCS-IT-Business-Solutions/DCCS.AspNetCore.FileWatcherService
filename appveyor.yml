@@ -1,0 +1,51 @@
+version: '1.0.{build}'
+image:
+- Ubuntu
+configuration:
+- Release
+platform: Any CPU
+environment:
+  nuget_api_key:
+    secure: 2Wzf/WM0HNumWS09Q/T1zhxk9yrBAgf5GsD0CgRc+FkHmDP+eLTzQDjVIVAHdryB
+  # Don't report back to the mothership
+  DOTNET_CLI_TELEMETRY_OPTOUT: 1
+init:
+- ps: $Env:LABEL = "CI" + $Env:APPVEYOR_BUILD_NUMBER.PadLeft(5, "0")
+
+dotnet_csproj: 
+  # Note: the .csproj file must already have the corresponding xml nodes, otherwise the patching will not work (e.g. add  <Version>1.1.1</Version> to your .csproj file)
+  patch: true
+  file: '**\*.csproj'
+  version: '{version}'
+  package_version: '{version}'
+  assembly_version: '{version}'
+  file_version: '{version}'
+  informational_version: '{version}'
+before_build:
+
+build_script:
+# if you want use a special version e.g. prerelease of the .NET Core SDK use the command line with the docker build, otherwise the plain dotnet build
+
+#- docker run -v $APPVEYOR_BUILD_FOLDER:/build --rm mcr.microsoft.com/dotnet/core/sdk:2.2 dotnet build /build/DCCS.AspNetCore.FileWatcherService -o /build/output
+- dotnet build DCCS.AspNetCore.FileWatcherService -o $APPVEYOR_BUILD_FOLDER/output
+
+after_build:
+
+test_script:
+
+artifacts:
+- path: output/**/*.*
+
+deploy:
+  - provider: NuGet
+    name: production
+    api_key:
+      secure: 2Wzf/WM0HNumWS09Q/T1zhxk9yrBAgf5GsD0CgRc+FkHmDP+eLTzQDjVIVAHdryB
+    skip_symbols: true
+    symbol_server:
+    on:
+       branch: master
+
+cache:
+#- '%USERPROFILE%\.nuget\packages'
+on_finish: # Run the demo to show that it works
