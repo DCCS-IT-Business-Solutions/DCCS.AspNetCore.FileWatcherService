@@ -27,7 +27,7 @@ namespace DCCS.AspNetCore.FileWatcherService
 
         protected virtual void OnChanged(FileWatcherEventArgs args)
         {
-            System.Diagnostics.Debug.WriteLine("I was called");
+            // System.Diagnostics.Debug.WriteLine("I was called");
             Changed?.Invoke(this, args);
         }
 

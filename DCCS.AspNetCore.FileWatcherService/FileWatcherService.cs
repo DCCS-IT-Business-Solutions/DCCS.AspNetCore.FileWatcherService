@@ -2,25 +2,37 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
 namespace DCCS.AspNetCore.FileWatcherService
 {
 
-    public class FileWatcherService : IFileWatcherService
+    public class FileWatcherService : IFileWatcherService, IHostedService
     {
         private const string DefaultConfigSectionName = "FileWatcherService";
         private readonly Dictionary<string, IWatch> _watches = new Dictionary<string, IWatch>();
-        public FileWatcherService Initialize(IConfiguration configuration, string configurationSectionName = DefaultConfigSectionName)
+        private IConfiguration _configuration;
+
+        public FileWatcherService(IConfiguration configuration)
+        {
+            _configuration = configuration;
+
+
+        }
+
+        public FileWatcherService Initialize(string configurationSectionName = DefaultConfigSectionName)
         {
             const string watchesNodeName = "Watches";
 
-            var settings = configuration.GetSection(configurationSectionName).GetSection(watchesNodeName).Get<WatchSetting[]>();
+            var settings = _configuration.GetSection(configurationSectionName).GetSection(watchesNodeName).Get<WatchSetting[]>();
 
       
             const string delayNodeName = "DelayInMS";
-            var delaySection = configuration.GetSection(configurationSectionName).GetSection(delayNodeName).Get<int>();
+            var delaySection = _configuration.GetSection(configurationSectionName).GetSection(delayNodeName).Get<int>();
 
             foreach (var watchSetting in settings)
             {
@@ -65,6 +77,31 @@ namespace DCCS.AspNetCore.FileWatcherService
             var watch = _watches[name];
             watch.Changed -= callback;
             return this;
+        }
+
+        public Task StartAsync(CancellationToken cancellationToken)
+        {
+            System.Diagnostics.Debug.WriteLine("Timed Background Service is starting.");
+
+            DoWork();
+
+            return Task.CompletedTask;
+        }
+
+        private void DoWork()
+        {
+            System.Diagnostics.Debug.WriteLine("Timed Background Service is working.");
+            this.Initialize();
+
+        }
+
+        public Task StopAsync(CancellationToken cancellationToken)
+        {
+            System.Diagnostics.Debug.WriteLine("Timed Background Service is stopping.");
+
+
+
+            return Task.CompletedTask;
         }
 
     }

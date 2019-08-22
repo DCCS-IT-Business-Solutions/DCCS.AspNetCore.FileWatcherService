@@ -17,8 +17,8 @@ namespace DCCS.AspNetCore.FileWatcherService
             IConfiguration configuration)
         {
             services.AddSingleton<IFileWatcherService, FileWatcherService>();
-            FileWatcherService fileWatcher = new FileWatcherService();
-            fileWatcher.Initialize(configuration);
+            FileWatcherService fileWatcher = new FileWatcherService(configuration);
+            fileWatcher.Initialize();
             return fileWatcher;
         }
 
