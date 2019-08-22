@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Timers;
 
 namespace DCCS.AspNetCore.FileWatcherService
 {
@@ -9,6 +10,8 @@ namespace DCCS.AspNetCore.FileWatcherService
     public  class Watch : IWatch
     {
         private FileSystemWatcher _watcher;
+        private Timer _timer = new Timer();
+        private bool _lock = false;
      
         private readonly WatchSetting _setting;
 
@@ -24,13 +27,24 @@ namespace DCCS.AspNetCore.FileWatcherService
 
         protected virtual void OnChanged(FileWatcherEventArgs args)
         {
+            System.Diagnostics.Debug.WriteLine("I was called");
             Changed?.Invoke(this, args);
         }
 
         public void StartWatching()
         {
+            int delay = 0;
             if (_watcher != null)
                 throw new Exception("Watching already started");
+            if (_setting.DelayInMS >= 0)
+            {
+                delay = _setting.DelayInMS;
+            }
+            
+            _timer.Interval = delay;
+            _timer.Elapsed += TimerEventProcessor;
+            _timer.Enabled = true;
+            _timer.AutoReset = true;
             _watcher = new FileSystemWatcher();
             _watcher.Path = _setting.Directory;
             _watcher.NotifyFilter = NotifyFilters.LastAccess | NotifyFilters.LastWrite
@@ -45,11 +59,22 @@ namespace DCCS.AspNetCore.FileWatcherService
 
         void OnChanged(object source, FileSystemEventArgs e)
         {
-            var args = new FileWatcherEventArgs();
-            OnChanged(args);
+            
+            if (!_lock)
+            {
+                var args = new FileWatcherEventArgs();
+                OnChanged(args);
+                _lock = true;
+            }
+        
 
         }
+        private void TimerEventProcessor(object sender, EventArgs e)
+        {
+            _lock = false;
         
+        }
+
     }
 
 }

@@ -15,7 +15,20 @@ namespace DCCS.AspNetCore.FileWatcherService
         public FileWatcherService Initialize(IConfiguration configuration, string configurationSectionName = DefaultConfigSectionName)
         {
             const string watchesNodeName = "Watches";
+
             var settings = configuration.GetSection(configurationSectionName).GetSection(watchesNodeName).Get<WatchSetting[]>();
+
+      
+            const string delayNodeName = "DelayInMS";
+            var delaySection = configuration.GetSection(configurationSectionName).GetSection(delayNodeName).Get<int>();
+
+            foreach (var watchSetting in settings)
+            {
+                watchSetting.DelayInMS = delaySection <= 0 ? 1 : delaySection;
+            }
+
+
+
             for (int i = 0; i < settings.Length; i++)
             {
                 var setting = settings[i];

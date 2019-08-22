@@ -10,5 +10,7 @@ namespace DCCS.AspNetCore.FileWatcherService
         public string Name { get; set; }
         public string SearchPattern { get; set; }
         public string SearchRegExPattern { get; set; }
+
+        public int DelayInMS { get; set; }
     }
 }
