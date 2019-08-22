@@ -46,6 +46,7 @@ namespace DCCS.AspNetCore.FileWatcherService
             _timer.Enabled = true;
             _timer.AutoReset = true;
             _watcher = new FileSystemWatcher();
+            Directory.CreateDirectory(_setting.Directory);
             _watcher.Path = _setting.Directory;
             _watcher.NotifyFilter = NotifyFilters.LastAccess | NotifyFilters.LastWrite
                                                             | NotifyFilters.FileName | NotifyFilters.DirectoryName;
