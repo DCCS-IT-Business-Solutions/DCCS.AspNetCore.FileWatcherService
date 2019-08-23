@@ -29,9 +29,6 @@ build_script:
 #- docker run -v $APPVEYOR_BUILD_FOLDER:/build --rm mcr.microsoft.com/dotnet/core/sdk:2.2 dotnet build /build/DCCS.AspNetCore.FileWatcherService -o /build/output
 - dotnet build DCCS.AspNetCore.FileWatcherService -o $APPVEYOR_BUILD_FOLDER/output
 
-after_build:
-
-test_script:
 
 test:
   # only assemblies to test
