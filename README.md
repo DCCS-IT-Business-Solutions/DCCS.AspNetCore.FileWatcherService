@@ -1,4 +1,4 @@
-# DCCS.FileWatcherService [![Build status](https://ci.appveyor.com/api/projects/status/lfdrbppktadocb0t?svg=true)](https://ci.appveyor.com/project/mgeramb/dccs-aspnetcore-filewatcherservice) [![NuGet Badge](https://buildstats.info/nuget/DCCS.AspNetCore.FileWatcherService)](https://www.nuget.org/packages/DCCS.AspNetCore.FileWatcherService/)
+# DCCS.AspNetCore.FileWatcherService [![Build status](https://ci.appveyor.com/api/projects/status/lfdrbppktadocb0t?svg=true)](https://ci.appveyor.com/project/mgeramb/dccs-aspnetcore-filewatcherservice) [![NuGet Badge](https://buildstats.info/nuget/DCCS.AspNetCore.FileWatcherService)](https://www.nuget.org/packages/DCCS.AspNetCore.FileWatcherService/)
 DCCS.FileWatcherService provide a simple configureable file watcher service which fires a notification with a short deplay to handle multiple file changes in a short time period. The notification handler can be specified as delegate in the startup of the your project or as http url in the configuration.
 
 ## Installation
