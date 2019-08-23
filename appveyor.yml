@@ -37,7 +37,7 @@ test:
   # only assemblies to test
   assemblies:
     only:
-      - '**\*.tests.dll'
+      - '**\*.Tests.dll'
 
 artifacts:
 - path: output/**/*.*
