@@ -17,8 +17,8 @@ namespace DCCS.AspNetCore.FileWatcherService.Sample.Controllers
             _logger = loggerFactory.CreateLogger(GetType());
         }
         // GET api/values
-        [HttpGet("startTextImport")]
-        public void StartTextImport()
+        [HttpPost("startTextImport")]
+        public void StartTextImport([FromBody] FileWatcherEventArgs args)
         {
             _logger.LogInformation("Text import triggered");
         }

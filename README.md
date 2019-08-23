@@ -1,5 +1,5 @@
 # DCCS.FileWatcherService [![Build status](https://ci.appveyor.com/api/projects/status/lfdrbppktadocb0t?svg=true)](https://ci.appveyor.com/project/mgeramb/dccs-aspnetcore-filewatcherservice) [![NuGet Badge](https://buildstats.info/nuget/DCCS.AspNetCore.FileWatcherService)](https://www.nuget.org/packages/DCCS.AspNetCore.FileWatcherService/)
-DCCS.FileWatcherService provide a simple configureable file watcher service which calls a function with a short deplay to handle multiple file changes in a short timer period. The callback can be specified as delegate in the startup of the your webproject or as url in the configuration.
+DCCS.FileWatcherService provide a simple configureable file watcher service which fires a notification with a short deplay to handle multiple file changes in a short time period. The notification handler can be specified as delegate in the startup of the your project or as http url in the configuration.
 
 ## Installation
 
@@ -14,14 +14,38 @@ Or via the .NET Core command line interface:
 Either commands, from Package Manager Console or .NET Core CLI, will download and install DCCS.AspNetCore.FileWatcherService and all required dependencies.
 
 
-## Examples
+## Usage
 
 Include in startup:
 ```csharp
-services.AddDccsBuildingBlockFileWatcherService()
-.AddNotificationHandler("Excel Change", (o,a) => { /* called for each change */ } )
+public void ConfigureServices(IServiceCollection services)
+{
+     services.AddDccsBuildingBlockFileWatcherService(Configuration)
+     // Optional call AddFileWatch to add an none configureable fileWatcher    
+    .AddFileWatch(new FileWatch(new FileWatchSetting { Name = "Word change", Directory = @"C:\Docs", CallbackUrl = "http://localhost/ImportWord" })); 
+     // Add NotificationHandler is optional and can be used to add C# delegates as callback
+    .AddNotificationHandler("Excel Change", (o, a) => { /* called for each change */ }) 
+}
 ```
 
+A watch configruation section can be placed in the "FileWatcherService" node or as array under "Watches"
+All watch configuration options:
+```json
+{
+    "Name": "<Name of the watcher>", // Required for array elements. Default under the root node: "#"
+    "Directory": "C:\\ImportText", // Required. Directory which will be observed
+    "SearchPattern": "*.txt", // Optional. Simple file name pattern with * and ? wildcards
+    "SearchRegExPattern": ".*", // Optional. Regular expression search pattern
+    "CallbackUrl": "http://localhost/MakeTextImport", // Optional. URL which will be called for a change
+    "CallbackMethod": "POST", // Optional, Default: GET, Values: POST|PUT|DELETE|GET Note: No filename information is provided for method GET
+    "NotifiyDelete": false, // Optional, Default: true
+    "NotifiyChange": false, // Optional, Default: true
+    "NotifiyNew": true, // Optional, Default: true
+    "DelayInMS": <Number> // Optional, Default: 500, Number of milliseconds for the delay for the notification, so that multiple changes will be reported in one notification
+}
+```
+
+## Example
 Configuration file section:
 ```json
 {
@@ -35,6 +59,7 @@ Configuration file section:
                 "SearchPattern": "*.txt",
                 "SearchRegExPattern": ".*",
                 "CallbackUrl": "http://localhost/MakeTextImport",
+                "CallbackMethod": "POST", 
                 "NotifiyDelete": false,
                 "NotifiyChange": false,
                 "NotifiyNew": true,

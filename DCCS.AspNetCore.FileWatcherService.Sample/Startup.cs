@@ -26,6 +26,7 @@ namespace DCCS.AspNetCore.FileWatcherService.Sample
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+
             services.AddDccsBuildingBlockFileWatcherService(Configuration)
                 .AddNotificationHandler("Excel Change", HandleExcelChange);
         }

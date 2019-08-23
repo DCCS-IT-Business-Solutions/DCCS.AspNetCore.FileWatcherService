@@ -13,7 +13,7 @@ namespace DCCS.AspNetCore.FileWatcherService
 {
     public static class StartupExtension
     {
-        public static Watch[] _watches;
+        public static FileWatch[] _watches;
         public static IFileWatcherService AddDccsBuildingBlockFileWatcherService(this IServiceCollection services,
             IConfiguration configuration, string configurationSectionName = FileWatcherService.DefaultConfigSectionName)
         {

@@ -11,57 +11,94 @@ using Microsoft.Extensions.Hosting;
 namespace DCCS.AspNetCore.FileWatcherService
 {
 
-    public class FileWatcherService : IFileWatcherService, IHostedService
+    public class FileWatcherService : IFileWatcherService, IHostedService, IDisposable
     {
         public const string DefaultConfigSectionName = "FileWatcherService";
-        private readonly Dictionary<string, IWatch> _watches = new Dictionary<string, IWatch>();
+        private const string RootWatchName = "#";
+        private readonly Dictionary<string, IFileWatch> _watches = new Dictionary<string, IFileWatch>();
         private readonly IConfiguration _configuration;
 
         public FileWatcherService(IConfiguration configuration, string configurationSectionName = DefaultConfigSectionName)
         {
             _configuration = configuration;
             const string watchesNodeName = "Watches";
+            var rootSection = !string.IsNullOrEmpty(configurationSectionName) ? _configuration.GetSection(configurationSectionName) : null;
+            var watchSettings = new List<FileWatchSetting>();
+            
+            // Check for watch setting in configuration node
+            var singleWatchSettings = rootSection?.Get<FileWatchSetting>();
+            if (singleWatchSettings != null && !string.IsNullOrEmpty(singleWatchSettings.Directory))
+            {
+                if (string.IsNullOrEmpty(singleWatchSettings.Name))
+                    singleWatchSettings.Name = RootWatchName;
+                watchSettings.Add(singleWatchSettings);
+            }
 
-            var settings = _configuration.GetSection(configurationSectionName)?.GetSection(watchesNodeName)?.Get<WatchSetting[]>();
-                  
+            // Check for an array of watch settings in the root node
+            var settings = rootSection?.GetSection(watchesNodeName)?.Get<FileWatchSetting[]>();
+            if (settings != null)
+                watchSettings.AddRange(settings);
+
+            // Handle default deleay      
             const string defaultDelayNodeName = "DefaultDelayInMS";
             var delaySection = _configuration.GetSection(configurationSectionName)?.GetSection(defaultDelayNodeName)?.Get<int>();
             if (delaySection != null)
             {
-                foreach (var watchSetting in settings)
+                foreach (var watchSetting in watchSettings)
                 {
-                    watchSetting.DelayInMS = delaySection.Value < 0 ? 0 : delaySection.Value;
-                }
-            }
-            if (settings != null)
-            {
-                for (int i = 0; i < settings.Length; i++)
-                {
-                    var setting = settings[i];
-                    if (string.IsNullOrEmpty(setting.Name))
-                        throw new Exception($"Configuration block {configurationSectionName}/{watchesNodeName}[{i}] has no or an empty {nameof(WatchSetting.Name)} property");
-                    var watch = new Watch(setting);
-                    AddWatch(watch);
-                    watch.StartWatching();
+                    if (watchSetting.DelayInMS == null)
+                        watchSetting.DelayInMS = delaySection.Value < 0 ? 0 : delaySection.Value;
                 }
             }
 
+            // Create watches
+            for (int i = 0; i < settings.Length; i++)
+            {
+                var setting = settings[i];
+                if (string.IsNullOrEmpty(setting.Name))
+                    throw new Exception($"Configuration block {configurationSectionName}/{watchesNodeName}[{i}] has no or an empty {nameof(FileWatchSetting.Name)} property");
+                var watch = new FileWatch(setting);
+                AddFileWatch(watch);
+            }
+
+            StartWatching();
         }
 
-        public void AddWatch(IWatch watch)
+        private void StartWatching()
+        {
+            foreach (var watch in _watches.Values)
+            {
+                if (!watch.Started)
+                    watch.StartWatching();
+            }
+        }
+
+        private void StopWatching()
+        {
+            foreach (var watch in _watches.Values)
+            {
+                watch.StopWatching();
+            }
+        }
+
+        public void AddFileWatch(IFileWatch watch)
         {
             if (_watches.ContainsKey(watch.Name))
                 throw new Exception($"Watch with name '{watch.Name}' exist already");
             _watches.Add(watch.Name, watch);
         }
 
-        public void RemoveWatch(string watcherName)
+        public void RemoveFileWatch(string watcherName)
         {
             _watches.Remove(watcherName);
         }
 
         public IFileWatcherService AddNotificationHandler(string watcherName, EventHandler<FileWatcherEventArgs> callback)
         {
+            if (callback == null)
+                throw new ArgumentNullException(nameof(callback));
+            if (string.IsNullOrEmpty(watcherName))
+                watcherName = RootWatchName;
             if (!_watches.ContainsKey(watcherName))
                 throw new Exception($"Watch with name '{watcherName}' does not exist");
             var watch = _watches[watcherName];
@@ -69,8 +106,30 @@ namespace DCCS.AspNetCore.FileWatcherService
             return this;
         }
 
+        public IFileWatcherService AddNotificationHandler(EventHandler<FileWatcherEventArgs> callback)
+        {
+            if (callback == null)
+                throw new ArgumentNullException(nameof(callback));
+            foreach (var watch in _watches.Values)
+                watch.Changed += callback;
+            return this;
+        }
+
+        public IFileWatcherService RemoveNotificationHandler(EventHandler<FileWatcherEventArgs> callback)
+        {
+            if (callback == null)
+                throw new ArgumentNullException(nameof(callback));
+            foreach (var watch in _watches.Values)
+                watch.Changed -= callback;
+            return this;
+        }
+
         public IFileWatcherService RemoveNotificationHandler(string watcherName, EventHandler<FileWatcherEventArgs> callback)
         {
+            if (callback == null)
+                throw new ArgumentNullException(nameof(callback));
+            if (string.IsNullOrEmpty(watcherName))
+                watcherName = RootWatchName;
             if (!_watches.ContainsKey(watcherName))
                 throw new Exception($"Watch with name '{watcherName}' does not exist");
             var watch = _watches[watcherName];
@@ -80,18 +139,19 @@ namespace DCCS.AspNetCore.FileWatcherService
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
-            return Task.CompletedTask;
+            return Task.Run(StartWatching, cancellationToken);
         }
 
         public Task StopAsync(CancellationToken cancellationToken)
         {
-            if (_watches != null)
-            {
-                foreach (var watch in _watches.Values)
-                    watch.StopWatching();
-            }
-            return Task.CompletedTask;
+            return Task.Run(StopWatching, cancellationToken);
         }
 
+        public void Dispose()
+        {
+            foreach (var watch in _watches.Values)
+                watch.Dispose();
+            _watches.Clear();
+        }
     }
 }
