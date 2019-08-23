@@ -30,7 +30,7 @@ public void ConfigureServices(IServiceCollection services)
 
 A watch configruation section can be placed in the "FileWatcherService" node or as array under "Watches"
 All watch configuration options:
-```json
+```
 {
     "Name": "<Name of the watcher>", // Required for array elements. Default under the root node: "#"
     "Directory": "C:\\ImportText", // Required. Directory which will be observed
