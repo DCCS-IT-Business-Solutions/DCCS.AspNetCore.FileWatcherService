@@ -6,6 +6,7 @@ using System.Threading;
 namespace DCCS.AspNetCore.FileWatcherService.Tests
 {
     [TestClass]
+    [TestCategory("Appveyor")]
     public class ServiceTest
     {
         string _testDirectory;
