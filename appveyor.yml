@@ -33,7 +33,7 @@ build_script:
 test:
   # only assemblies to test
   assemblies:
-    - **\*.Tests.dll
+    - '**\*.Tests.dll'
   categories:
     - Appveyor
     
