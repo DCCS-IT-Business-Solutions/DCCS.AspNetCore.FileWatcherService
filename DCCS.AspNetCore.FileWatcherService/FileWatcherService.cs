@@ -16,13 +16,11 @@ namespace DCCS.AspNetCore.FileWatcherService
         public const string DefaultConfigSectionName = "FileWatcherService";
         private const string RootWatchName = "#";
         private readonly Dictionary<string, IFileWatch> _watches = new Dictionary<string, IFileWatch>();
-        private readonly IConfiguration _configuration;
 
         public FileWatcherService(IConfiguration configuration, string configurationSectionName = DefaultConfigSectionName)
         {
-            _configuration = configuration;
             const string watchesNodeName = "Watches";
-            var rootSection = !string.IsNullOrEmpty(configurationSectionName) ? _configuration.GetSection(configurationSectionName) : null;
+            var rootSection = !string.IsNullOrEmpty(configurationSectionName) ? configuration?.GetSection(configurationSectionName) : null;
             var watchSettings = new List<FileWatchSetting>();
             
             // Check for watch setting in configuration node
@@ -41,7 +39,7 @@ namespace DCCS.AspNetCore.FileWatcherService
 
             // Handle default deleay      
             const string defaultDelayNodeName = "DefaultDelayInMS";
-            var delaySection = _configuration.GetSection(configurationSectionName)?.GetSection(defaultDelayNodeName)?.Get<int>();
+            var delaySection = configuration?.GetSection(configurationSectionName)?.GetSection(defaultDelayNodeName)?.Get<int>();
             if (delaySection != null)
             {
                 foreach (var watchSetting in watchSettings)
@@ -52,15 +50,17 @@ namespace DCCS.AspNetCore.FileWatcherService
             }
 
             // Create watches
-            for (int i = 0; i < settings.Length; i++)
+            if (settings != null)
             {
-                var setting = settings[i];
-                if (string.IsNullOrEmpty(setting.Name))
-                    throw new Exception($"Configuration block {configurationSectionName}/{watchesNodeName}[{i}] has no or an empty {nameof(FileWatchSetting.Name)} property");
-                var watch = new FileWatch(setting);
-                AddFileWatch(watch);
+                for (int i = 0; i < settings.Length; i++)
+                {
+                    var setting = settings[i];
+                    if (string.IsNullOrEmpty(setting.Name))
+                        throw new Exception($"Configuration block {configurationSectionName}/{watchesNodeName}[{i}] has no or an empty {nameof(FileWatchSetting.Name)} property");
+                    var watch = new FileWatch(setting);
+                    AddFileWatch(watch);
+                }
             }
-
             StartWatching();
         }
 
